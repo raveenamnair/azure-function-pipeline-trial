@@ -1,62 +1,36 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js project to Azure Function App - Azure-FunctionApp-Pipeline
+name: Deploy Node.js project to function app
 
 on:
-  push:
-    branches:
-      - master
-  workflow_dispatch:
-    inputs:
-        # This is the path of your Azure Function in Git.  
-        GIT_FunctionApp_Name:
-          description: 'Provide the Function App Name'
-          required: true
-          default: 'Azure-FunctionApp-Pipeline'
-          
-        GIT_FunctionApp_URL:
-          description: 'Provide the Function App URL'
-          required: true
-          default: 'https://azure-functionapp-pipeline.azurewebsites.net'
-          
-        # This is the path of your Function app in Git.
-        GIT_FunctionApp_PATH:
-          description: 'Relative path for Function'
-          required: true
-          default: 'src/functions' 
+  [push]
 
 env:
-  AZURE_FUNCTIONAPP_NAME: ${{ github.workspace }}/${{ github.event.inputs.GIT_FunctionApp_PATH }} # set this to your application's name
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'src/functions' # set this to the path to your web app project, defaults to the repository root
-  NODE_VERSION: '18.x' # set this to the node version to use (supports 8.x, 10.x, 12.x)
+  AZURE_FUNCTIONAPP_NAME: 'Azure-FunctionApp-Pipeline'    # set this to your application's name
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'src/functions'      # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '18.x'                     # set this to the node version to use (supports 8.x, 10.x, 12.x, 14.x)
 
 jobs:
   build-and-deploy:
     runs-on: windows-latest
     steps:
-      - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v2
+    - name: 'Checkout GitHub action'
+      uses: actions/checkout@v2
 
-      - name: Setup Node ${{ env.NODE_VERSION }} Environment
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+    - name: Setup Node ${{ env.NODE_VERSION }} Environment
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
-      - name: 'Resolve Project Dependencies Using Npm'
-        shell: pwsh
-        run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          npm install
-          npm run build --if-present
-          npm run test --if-present
-          popd
-
-      - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1
-        id: fa
-        with:
-          app-name: 'Azure-FunctionApp-Pipeline'
-          slot-name: 'Production'
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+    - name: 'Resolve Project Dependencies Using Npm'
+      shell: pwsh
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        npm install
+        npm run build --if-present
+        npm run test --if-present
+        popd
+    - name: 'Run Azure Functions action'
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
