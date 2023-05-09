@@ -24,11 +24,11 @@ on:
         GIT_FunctionApp_PATH:
           description: 'Relative path for Function'
           required: true
-          default: '/src/functions/'
+          default: 'src/functions' 
 
 env:
   AZURE_FUNCTIONAPP_NAME: ${{ github.workspace }}/${{ github.event.inputs.GIT_FunctionApp_PATH }} # set this to your application's name
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '/src/functions/' # set this to the path to your web app project, defaults to the repository root
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'src/functions' # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '18.x' # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
 jobs:
