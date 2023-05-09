@@ -8,9 +8,26 @@ on:
     branches:
       - master
   workflow_dispatch:
+    inputs:
+        # This is the path of your Azure Function in Git.  
+        GIT_FunctionApp_Name:
+          description: 'Provide the Function App Name'
+          required: true
+          default: 'Azure-FunctionApp-Pipeline'
+          
+        GIT_FunctionApp_URL:
+          description: 'Provide the Function App URL'
+          required: true
+          default: 'https://azure-functionapp-pipeline.azurewebsites.net'
+          
+        # This is the path of your Function app in Git.
+        GIT_FunctionApp_PATH:
+          description: 'Relative path for Function'
+          required: true
+          default: '/src/functions/'
 
 env:
-  AZURE_FUNCTIONAPP_NAME: 'Azure-FunctionApp-Pipeline'  # set this to your application's name
+  AZURE_FUNCTIONAPP_NAME: ${{ github.workspace }}/${{ github.event.inputs.GIT_FunctionApp_PATH }} # set this to your application's name
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '18.x' # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
@@ -42,4 +59,4 @@ jobs:
           app-name: 'Azure-FunctionApp-Pipeline'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E94F07E59B8A4D7EB630D99558D510D3 }}
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
